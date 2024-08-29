@@ -7,4 +7,5 @@ route.get('/detail/:id',controller.detail)
 route.patch('/change-status',controller.changeStatus)
 route.post('/create',controller.create)
 route.patch('/update',controller.update)
+route.patch('/delete',controller.delete)
 module.exports=route
