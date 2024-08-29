@@ -150,3 +150,56 @@ module.exports.otpPassword=async(req,res)=>{
     })
   }
 }
+//[PATCH]/user/password/reset
+module.exports.reset=async(req,res)=>{
+  const {token,password}=req.body
+  const user=await User.findOne({
+    token:token,
+    deleted:false
+  })
+  if(!user){
+    res.json({
+      code:400,
+      message:"Cập nhật mật khẩu thất bại"
+    })
+    return
+  }
+  await User.updateOne({
+    token:token,
+    deleted:false
+  },{
+    password:md5(password)
+  })
+  try{
+    res.json({
+      code:200,
+      message:"Cập nhật mật khẩu thành công"
+    })
+  }
+  catch{
+    res.json({
+      code:400,
+      message:"Cập nhật mật khẩu thất bại"
+    })
+  }
+}
+//[GET]/user/profile
+module.exports.profile=async(req,res)=>{
+  try{
+    const user=await User.findOne({ 
+      token:req.tokenVerify,
+      deleted:false
+    }).select("-password -token ")
+
+    res.json({
+      code:200,
+      user:user
+    })
+  }
+  catch{
+    res.json({
+      code:400,
+      message:"Có lỗi xảy ra vui lòng thử lại"
+    })
+  }
+}

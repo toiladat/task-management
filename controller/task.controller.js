@@ -1,7 +1,17 @@
 const Task = require('../models/task.models');
+const User=require('../models/user.model');
 //[GET]/tasks/
 module.exports.index = async (req, res) => {
+  // tra ra task duoc tao boi userId hoac user nam trong task do
   const find = {
+    $or:[
+      {
+        createdBy:req.user.id
+      },
+      {
+        listUsers:req.user.id
+      }
+    ],
     deleted:false
   }
   //trang thai
@@ -93,6 +103,13 @@ module.exports.changeStatus=async(req,res)=>{
 //[POST]/tasks/create
 module.exports.create=async (req,res)=>{
 try{
+  const user=req.user
+  req.body.createdBy=req.user._id
+  const listUsers=req.body.listUsers
+  for(const userId of listUsers){
+    //neu co userId sai se tu vao catch
+    const checkInfor= await User.findOne({_id:userId})
+  }
   const newTask= new Task(req.body)
   newTask.save()
   res.json({
@@ -102,7 +119,7 @@ try{
 }
 catch{
   res.json({
-    "message":"Thêm Task thất bại"
+    message:"Có lỗi xảy ra vui lòng thử lại"
   })
 }
 }
