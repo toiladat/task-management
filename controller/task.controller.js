@@ -3,6 +3,8 @@ const User=require('../models/user.model');
 //[GET]/tasks/
 module.exports.index = async (req, res) => {
   // tra ra task duoc tao boi userId hoac user nam trong task do
+  // dung $in khi id la 1 record, khi tim 1 id trong db theo list ds cua min
+  // listid: id => khi id la id nguoi dung, khi ktra nhung list nao co id minh cho
   const find = {
     $or:[
       {
@@ -103,13 +105,19 @@ module.exports.changeStatus=async(req,res)=>{
 //[POST]/tasks/create
 module.exports.create=async (req,res)=>{
 try{
-  const user=req.user
   req.body.createdBy=req.user._id
+
+  //ktra hop le ids gui len
   const listUsers=req.body.listUsers
   for(const userId of listUsers){
     //neu co userId sai se tu vao catch
     const checkInfor= await User.findOne({_id:userId})
-  }
+  } 
+
+  //ktra parentIdTask 
+  const checkTask=await Task.findOne({_id:req.body.parentIdTask})
+
+
   const newTask= new Task(req.body)
   newTask.save()
   res.json({
